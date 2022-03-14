@@ -5,6 +5,9 @@ from ssd1306 import SSD1306_I2C
 
 width = 128
 height = 64
+segment_length = 20
+left_margin = 28
+spacing = 8
 
 
 def init_display():
@@ -17,32 +20,6 @@ def init_display():
         pass
     
     return None
-    
-def write_some_text(display):
-    display.fill(0)
-    display.text('Byte me!', 5, 5)
-    display.text('123456789012345', 5, 16)
-    display.text('...............', 5, 26)
-    display.text('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 5, 36)
-    display.show()
-
-
-def draw_some_pixels(display):
-    x = 0
-    y = 0
-
-    for _ in range(64):
-        display.fill(0)
-
-        display.pixel((x % width), (y % height), 1)
-        display.pixel((x % width) + 2, (y % height) + 1, 1)
-        display.pixel((x % width) + 4, (y % height) + 2, 1)
-        display.pixel((x % width) + 6, (y % height) + 3, 1)
-        display.pixel((x % width) + 8, (y % height) + 4, 1)
-        display.show()
-        x += 2
-        y += 1
-        time.sleep(.05)
     
     
 def draw_ssd1306_demo(display):
@@ -59,15 +36,75 @@ def draw_ssd1306_demo(display):
     display.text('OLED 128x64', 40, offset+24, 1)
     display.show()
 
+def seg_0(display, offset):
+    x = left_margin + offset
+    display.hline(x, 16, segment_length, 1)
+    display.hline(x, 17, segment_length, 1)
+    #display.show()
 
 
+def seg_1(display, offset):
+    x = left_margin + offset
+    display.vline(x, 17, segment_length, 1)
+    display.vline(x+1, 17, segment_length, 1)
+    #display.show()
+
+
+def seg_2(display, offset):
+    x = left_margin + segment_length + offset
+    display.vline(x, 17, segment_length, 1)
+    display.vline(x+1, 17, segment_length, 1)
+    #display.show()
+    
+def seg_3(display, offset):
+    x = left_margin + offset
+    display.hline(x, segment_length + 16, segment_length, 1)
+    display.hline(x, segment_length + 17, segment_length, 1)
+    #display.show()
+
+def seg_4(display, offset):
+    x = left_margin + offset
+    display.vline(x, segment_length + 17, segment_length, 1)
+    display.vline(x+1, segment_length + 17, segment_length, 1)
+    #display.show()
+
+def seg_5(display, offset):
+    x = left_margin + segment_length + offset
+    display.vline(x, segment_length + 17, segment_length, 1)
+    display.vline(x+1, segment_length + 17, segment_length, 1)
+    #display.show()
+
+def seg_6(display, offset):
+    x = left_margin + offset
+    display.hline(x, 2 * segment_length + 16, segment_length, 1)
+    display.hline(x, 2 * segment_length + 17, segment_length, 1)
+    #display.show()
+
+    
 if __name__ == '__main__':
-    delay = 3
     display = init_display()
-    while True:
-        write_some_text(display)
-        time.sleep(delay)
-        draw_some_pixels(display)
-        # time.sleep(delay)
-        draw_ssd1306_demo(display)
-        time.sleep(delay)
+    #seg_0(display, 0)
+    seg_0(display, segment_length + spacing)
+    
+    seg_1(display, 0)
+    #seg_1(display, segment_length + spacing)
+    
+    seg_2(display, 0)
+    seg_2(display, segment_length + spacing)
+    
+    seg_3(display, 0)
+    seg_3(display, segment_length + spacing)
+    
+    #seg_4(display, 0)
+    seg_4(display, segment_length + spacing)
+
+    seg_5(display, 0)
+    #seg_5(display, segment_length + spacing)
+
+    #seg_6(display, 0)
+    seg_6(display, segment_length + spacing)
+
+    display.show()
+    
+
+    
