@@ -18,10 +18,10 @@ def init_display():
         return display
     except Exception:
         pass
-    
+
     return None
-    
-    
+
+
 def draw_ssd1306_demo(display):
     display.fill(0)
     offset = 16
@@ -36,75 +36,174 @@ def draw_ssd1306_demo(display):
     display.text('OLED 128x64', 40, offset+24, 1)
     display.show()
 
+
 def seg_0(display, offset):
     x = left_margin + offset
     display.hline(x, 16, segment_length, 1)
     display.hline(x, 17, segment_length, 1)
-    #display.show()
 
 
 def seg_1(display, offset):
     x = left_margin + offset
     display.vline(x, 17, segment_length, 1)
     display.vline(x+1, 17, segment_length, 1)
-    #display.show()
 
 
 def seg_2(display, offset):
     x = left_margin + segment_length + offset
     display.vline(x, 17, segment_length, 1)
     display.vline(x+1, 17, segment_length, 1)
-    #display.show()
-    
+
+
 def seg_3(display, offset):
     x = left_margin + offset
     display.hline(x, segment_length + 16, segment_length, 1)
     display.hline(x, segment_length + 17, segment_length, 1)
-    #display.show()
+
 
 def seg_4(display, offset):
     x = left_margin + offset
     display.vline(x, segment_length + 17, segment_length, 1)
     display.vline(x+1, segment_length + 17, segment_length, 1)
-    #display.show()
+
 
 def seg_5(display, offset):
     x = left_margin + segment_length + offset
     display.vline(x, segment_length + 17, segment_length, 1)
     display.vline(x+1, segment_length + 17, segment_length, 1)
-    #display.show()
+
 
 def seg_6(display, offset):
     x = left_margin + offset
     display.hline(x, 2 * segment_length + 16, segment_length, 1)
     display.hline(x, 2 * segment_length + 17, segment_length, 1)
-    #display.show()
 
-    
-if __name__ == '__main__':
-    display = init_display()
-    #seg_0(display, 0)
-    seg_0(display, segment_length + spacing)
-    
-    seg_1(display, 0)
-    #seg_1(display, segment_length + spacing)
-    
-    seg_2(display, 0)
-    seg_2(display, segment_length + spacing)
-    
-    seg_3(display, 0)
-    seg_3(display, segment_length + spacing)
-    
-    #seg_4(display, 0)
-    seg_4(display, segment_length + spacing)
 
-    seg_5(display, 0)
-    #seg_5(display, segment_length + spacing)
+def calculate_offset(power):
+    if power == 0:
+        offset = segment_length + spacing
+    elif power == 1:
+        offset = 0
+    else:
+        offset = 0
 
-    #seg_6(display, 0)
-    seg_6(display, segment_length + spacing)
+    return offset
+
+
+def write_0(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_1(display, offset)
+    seg_2(display, offset)
+    seg_4(display, offset)
+    seg_5(display, offset)
+    seg_6(display, offset)
+
+
+def write_1(display, power):
+    offset = calculate_offset(power)
+    seg_2(display, offset)
+    seg_5(display, offset)
+
+
+def write_2(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_2(display, offset)
+    seg_3(display, offset)
+    seg_4(display, offset)
+    seg_6(display, offset)
+
+
+def write_3(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_2(display, offset)
+    seg_3(display, offset)
+    seg_5(display, offset)
+    seg_6(display, offset)
+
+
+def write_4(display, power):
+    offset = calculate_offset(power)
+    seg_1(display, offset)
+    seg_2(display, offset)
+    seg_3(display, offset)
+    seg_5(display, offset)
+
+
+def write_5(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_1(display, offset)
+    seg_3(display, offset)
+    seg_5(display, offset)
+    seg_6(display, offset)
+
+
+def write_6(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_1(display, offset)
+    seg_3(display, offset)
+    seg_4(display, offset)
+    seg_5(display, offset)
+    seg_6(display, offset)
+
+
+def write_7(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_2(display, offset)
+    seg_5(display, offset)
+
+
+def write_8(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_1(display, offset)
+    seg_2(display, offset)
+    seg_3(display, offset)
+    seg_4(display, offset)
+    seg_5(display, offset)
+    seg_6(display, offset)
+
+
+def write_9(display, power):
+    offset = calculate_offset(power)
+    seg_0(display, offset)
+    seg_1(display, offset)
+    seg_2(display, offset)
+    seg_3(display, offset)
+    seg_5(display, offset)
+
+
+def write_number(display, n):
+    f = [
+        write_0,
+        write_1,
+        write_2,
+        write_3,
+        write_4,
+        write_5,
+        write_6,
+        write_7,
+        write_8,
+        write_9
+    ]
+    display.fill(0)
+    if n >= 0 or n < 100:
+        x = int(n / 10)
+        if x > 0:
+            f[x](display, 1)
+        x = n % 10
+        f[x](display, 0)
 
     display.show()
-    
 
-    
+
+if __name__ == '__main__':
+    display = init_display()
+    for n in range(100):
+        write_number(display, n)
+        time.sleep(.2)
