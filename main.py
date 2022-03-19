@@ -1,25 +1,40 @@
 import time
+from machine import ADC
 from machine import Pin
 from machine import I2C
 from ssd1306 import SSD1306_I2C
+from bme280 import BME280
+
+'''
+Use i2c.scan() if you don't know these addresses.
+Example:
+        i2c = I2C(0, scl=Pin(17), sda=Pin(16), freq=200000)
+        addr = i2c.scan()[0]
+'''
+display_address = 60
+bme280_address = 119
 
 width = 128
 height = 64
 segment_length = 20
 left_margin = 28
 spacing = 8
+voltage_factor = 3.3 / 65536
+voltage_factor = 3.26 / 65535
 
 
-def init_display():
+
+def init_devices():
     try:
         i2c = I2C(0, scl=Pin(17), sda=Pin(16), freq=200000)
-        addr = i2c.scan()[0]
-        display = SSD1306_I2C(width, height, i2c, addr)
-        return display
+        display = SSD1306_I2C(width, height, i2c, display_address)
+        sensor = BME280(i2c=i2c, address=bme280_address)
+        
+        return display, sensor
     except Exception:
         pass
 
-    return None
+    return None, None
 
 
 def draw_ssd1306_demo(display):
@@ -203,7 +218,21 @@ def write_number(display, n):
 
 
 if __name__ == '__main__':
-    display = init_display()
-    for n in range(100):
-        write_number(display, n)
-        time.sleep(.2)
+    display, sensor = init_devices()
+
+    if 1 == 2:
+        for n in range(100):
+            write_number(display, n)
+            time.sleep(.05)
+
+    onboard_sensor = ADC(4)
+    while True:
+        tmp = onboard_sensor.read_u16() * voltage_factor
+        temp = 27 - (tmp - 0.706) / 0.001721
+        print('onboard_sensor: {}'.format(temp))
+
+        temp = round(sensor.read_compensated_data()[0] / 100)
+        write_number(display, int(temp))
+        print('    bme_sensor: {}'.format(temp))
+        print()
+        time.sleep(1)
